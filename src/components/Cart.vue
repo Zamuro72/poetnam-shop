@@ -29,7 +29,7 @@
 
 <script setup>
 import { Minus, Plus, Trash2 } from 'lucide-vue-next'
-import { useCartStore } from '../store'
+import { useCartStore } from '@/store'
 
 const props = defineProps({
   item: {
