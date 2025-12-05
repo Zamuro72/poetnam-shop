@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { useCartStore } from '@/store'
+import { useCartStore } from '../store/index.js'
 
 const props = defineProps({
   product: {

@@ -43,7 +43,7 @@
 <script setup>
 import { ShoppingCart } from 'lucide-vue-next'
 import Cart from '../components/Cart.vue'
-import { useCartStore } from '@/store'
+import { useCartStore } from '../store/index.js'
 
 const cartStore = useCartStore()
 </script>
