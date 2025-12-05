@@ -1,8 +1,9 @@
 <template>
-  <nav class="navbar">
+  <nav class="navbar" :class="{ 'navbar-hidden': !showNavbar }">
     <div class="container navbar-content">
       <router-link to="/" class="logo">
-        Poetnam Shop
+        <img src="https://image2url.com/images/1764902453031-86c95471-3ad8-46c6-9f9b-3196954dcfec.png" alt="Poetnam Shop" class="logo-image" />
+        <span class="logo-text">Poetnam Shop</span>
       </router-link>
 
       <!-- Desktop Menu -->
@@ -40,12 +41,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { ShoppingCart, Menu, X } from 'lucide-vue-next'
 import { useCartStore } from '@/stores'
 
 const cartStore = useCartStore()
 const menuOpen = ref(false)
+const showNavbar = ref(true)
+const lastScrollPosition = ref(0)
 
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value
@@ -54,15 +57,55 @@ const toggleMenu = () => {
 const closeMenu = () => {
   menuOpen.value = false
 }
+
+const handleScroll = () => {
+  const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
+  
+  // Jika di posisi paling atas, selalu tampilkan navbar
+  if (currentScrollPosition < 10) {
+    showNavbar.value = true
+    lastScrollPosition.value = currentScrollPosition
+    return
+  }
+  
+  // Jika scroll ke bawah, sembunyikan navbar
+  if (currentScrollPosition > lastScrollPosition.value && currentScrollPosition > 100) {
+    showNavbar.value = false
+  } 
+  // Jika scroll ke atas, tampilkan navbar
+  else if (currentScrollPosition < lastScrollPosition.value) {
+    showNavbar.value = true
+  }
+  
+  lastScrollPosition.value = currentScrollPosition
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
 
 <style scoped>
 .navbar {
   background: white;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .navbar-content {
@@ -73,13 +116,31 @@ const closeMenu = () => {
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-text {
   font-size: 1.875rem;
   font-weight: 700;
   background: linear-gradient(to right, #ec4899, #9333ea);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-decoration: none;
 }
 
 .desktop-menu {
@@ -100,6 +161,23 @@ const closeMenu = () => {
   color: #4b5563;
   text-decoration: none;
   transition: color 0.3s ease;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(to right, #ec4899, #9333ea);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.router-link-active::after {
+  width: 100%;
 }
 
 .nav-link:hover,
@@ -139,6 +217,12 @@ const closeMenu = () => {
   justify-content: center;
   font-size: 0.875rem;
   font-weight: 700;
+  animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
 .mobile-menu-btn {
@@ -168,12 +252,13 @@ const closeMenu = () => {
   font-weight: 600;
   color: #4b5563;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .mobile-link:hover,
 .mobile-link.router-link-active {
   color: #ec4899;
+  background: #fce7f3;
 }
 
 .slide-enter-active,
