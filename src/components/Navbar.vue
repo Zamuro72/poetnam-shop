@@ -42,7 +42,7 @@
 <script setup>
 import { ref } from 'vue'
 import { ShoppingCart, Menu, X } from 'lucide-vue-next'
-import { useCartStore } from '../store/index.js'
+import { useCartStore } from '@/stores'
 
 const cartStore = useCartStore()
 const menuOpen = ref(false)
